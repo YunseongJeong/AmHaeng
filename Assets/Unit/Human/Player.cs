@@ -13,8 +13,11 @@ public class Player : Human
         setSpeed(10);
         setJumpSpeed(15);
         setMass(10);
+        setGroundSensor(new Vector2(0, -1.5f), new Vector2(1, 0.5f));
+        isGrounded();
     }
     
+
     // Update is called once per frame
     void Update()
     {
@@ -30,7 +33,11 @@ public class Player : Human
         move(direction, true);
         if (Input.GetKey(KeyCode.Space))
         {
-            jump();
+            if (isGrounded())
+            {
+                jump();
+            }
+            
         }
     }
 }
