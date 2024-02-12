@@ -10,6 +10,7 @@ public class Human : MonoBehaviour
     private Vector2 groundSensorPos;
     private Vector2 groundSensorhalfSize;
     Rigidbody2D rigid2D;
+    Animator m_Animator;
 
     private void OnDrawGizmos()
     {
@@ -54,6 +55,11 @@ public class Human : MonoBehaviour
         return false;
     }
 
+    public void setAnimator(Animator animator)
+    {
+        this.m_Animator = animator;
+    }
+
     public void setMass(int mass)
     {
         this.rigid2D.mass = mass;
@@ -80,5 +86,9 @@ public class Human : MonoBehaviour
             transform.localScale = new Vector3(direction*0.3f, 0.3f, 1);
         }
         this.rigid2D.velocity = new Vector2(direction * this.speed, this.rigid2D.velocity.y);
+        if (!isRunning)
+        {
+            m_Animator.SetBool("isWalk", true);
+        }
     }
 }

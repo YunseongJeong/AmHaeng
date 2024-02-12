@@ -5,7 +5,7 @@ using UnityEngine;
 public class Player : Human
 {
     int direction = 0;
-
+    public Animator m_animator;
     // Start is called before the first frame update
     void Start()
     {
@@ -15,6 +15,7 @@ public class Player : Human
         setMass(10);
         setGroundSensor(new Vector2(0, -1.5f), new Vector2(1, 0.5f));
         isGrounded();
+        setAnimator(m_animator);
     }
     
 
@@ -30,7 +31,7 @@ public class Player : Human
         {
             direction = -1;
         }
-        move(direction, true);
+        move(direction, false);
         if (Input.GetKey(KeyCode.Space))
         {
             if (isGrounded())
