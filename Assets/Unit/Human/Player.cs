@@ -6,32 +6,44 @@ public class Player : Human
 {
     int direction = 0;
     public Animator m_animator;
+    public GameObject outerwear;
+    private Animator outerwearAnimator;
     // Start is called before the first frame update
     void Start()
     {
-        setRigidbody2D();
-        setSpeed(10);
+        setRigidbody2D(this.GetComponent<Rigidbody2D>());
+        setSpeed(2);
         setJumpSpeed(15);
-        setMass(10);
-        setGroundSensor(new Vector2(0, -1.5f), new Vector2(1, 0.5f));
+        setMass(100);
+        setGroundSensor(new Vector2(0, -2.2f), new Vector2(1, 0.2f));
         isGrounded();
         setAnimator(m_animator);
+        outerwearAnimator = outerwear.GetComponent<Animator>();
+        outerwearAnimator.SetBool("moveOuter", true);
+        
     }
     
 
     // Update is called once per frame
     void Update()
     {
+        jumpAndFallAnimation();
+        bool isRunning = Input.GetKey(KeyCode.LeftShift);
         direction = 0;
         if(Input.GetKey(KeyCode.D))
         {
             direction = 1;
+            move(direction, isRunning);
         }
-        if (Input.GetKey(KeyCode.A))
+        else if (Input.GetKey(KeyCode.A))
         {
             direction = -1;
+            move(direction, isRunning);
+        } else
+        {
+            stopMove();
         }
-        move(direction, false);
+        
         if (Input.GetKey(KeyCode.Space))
         {
             if (isGrounded())
