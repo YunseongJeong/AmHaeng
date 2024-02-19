@@ -11,7 +11,8 @@ public class Human : MonoBehaviour
     private Vector2 groundSensorhalfSize;
     Rigidbody2D rigid2D;
     Animator m_Animator;
-
+    private int direction = 1;
+    private bool mustStopMove = false;
     
     // Start is called before the first frame update
     void Start()
@@ -120,12 +121,41 @@ public class Human : MonoBehaviour
         this.rigid2D.velocity = new Vector2(this.rigid2D.velocity.x, this.jumpSpeed);
     }
 
+    public void Attack()
+    {
+        
+        Debug.Log("Human:Attack | isAttacking");
+        
+        StartCoroutine(Attack1());
+    }
+
+    IEnumerator Attack1()
+    {
+        stopMove();
+        mustStopMove = true;
+        m_Animator.SetTrigger("Attack");
+        yield return new WaitForSeconds(0.2f);
+        int count = 0;
+        while (count <= 30)
+        {
+            this.rigid2D.velocity = new Vector2(this.speed * 10 * this.direction, this.rigid2D.velocity.y);
+            yield return new WaitForSeconds(0.003f);
+            count += 1;
+        }
+        mustStopMove = false;
+    }
+
     public void move(int direction, bool isRunning)
     {
+        this.direction = direction;
+        
         if (direction != 0)
         {
-            transform.localScale = new Vector3(direction*0.3f, 0.3f, 1);
-            
+            transform.localScale = new Vector3(direction * 0.3f, 0.3f, 1);
+        }
+        if (mustStopMove)
+        {
+            return;
         }
         float moveSpeed;
         if (isRunning)

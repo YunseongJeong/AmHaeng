@@ -27,30 +27,48 @@ public class Player : Human
     // Update is called once per frame
     void Update()
     {
-        jumpAndFallAnimation();
-        bool isRunning = Input.GetKey(KeyCode.LeftShift);
-        direction = 0;
-        if(Input.GetKey(KeyCode.D))
-        {
-            direction = 1;
-            move(direction, isRunning);
-        }
-        else if (Input.GetKey(KeyCode.A))
-        {
-            direction = -1;
-            move(direction, isRunning);
-        } else
-        {
-            stopMove();
-        }
         
-        if (Input.GetKey(KeyCode.Space))
+
+        if (Input.GetKeyDown(KeyCode.Mouse0))
         {
-            if (isGrounded())
-            {
-                jump();
-            }
-            
+            //Attack
+            Attack();
+            StartCoroutine(Delay(5f));
         }
+        else
+        {
+            //Walk and run, jump Part
+            jumpAndFallAnimation();
+            bool isRunning = !Input.GetKey(KeyCode.LeftShift);
+            direction = 0;
+            if (Input.GetKey(KeyCode.D))
+            {
+                direction = 1;
+                move(direction, isRunning);
+            }
+            else if (Input.GetKey(KeyCode.A))
+            {
+                direction = -1;
+                move(direction, isRunning);
+            }
+            else
+            {
+                stopMove();
+            }
+
+            if (Input.GetKey(KeyCode.Space))
+            {
+                if (isGrounded())
+                {
+                    jump();
+                }
+
+            }
+        }
+    }
+
+    IEnumerator Delay(float time)
+    {
+        yield return new WaitForSeconds(time);
     }
 }
