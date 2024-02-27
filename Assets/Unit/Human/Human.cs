@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using UnityEngine;
 //using static UnityEditor.PlayerSettings;
 
@@ -13,6 +14,7 @@ public class Human : MonoBehaviour
     Animator m_Animator;
     private int direction = 1;
     private bool mustStopMove = false;
+    private bool AllStopBool = false;
     
     // Start is called before the first frame update
     void Start()
@@ -24,7 +26,6 @@ public class Human : MonoBehaviour
     void Update()
     {
         //OnDrawGizmos();
-        Debug.Log("Human:jumpAndFallAnimation");
     }
 
     public void jumpAndFallAnimation()
@@ -35,7 +36,7 @@ public class Human : MonoBehaviour
             {
                 if (!m_Animator.GetBool("isJumping"))
                 {
-                    Debug.Log("Human:jumpAndFallAnimation | isJumping");
+                    UnityEngine.Debug.Log("Human:jumpAndFallAnimation | isJumping");
                     m_Animator.SetBool("isJumping", true);
                     m_Animator.SetBool("isFalling", false);
                 }
@@ -44,7 +45,7 @@ public class Human : MonoBehaviour
             {
                 if (!m_Animator.GetBool("isFalling"))
                 {
-                    Debug.Log("Human:jumpAndFallAnimation | isFalling");
+                    UnityEngine.Debug.Log("Human:jumpAndFallAnimation | isFalling");
                     m_Animator.SetBool("isFalling", true);
                     m_Animator.SetBool("isJumping", false);
                 }
@@ -68,6 +69,7 @@ public class Human : MonoBehaviour
         this.groundSensorPos = pos;
         this.groundSensorhalfSize = halfSize;
     }
+
     /*
     private void OnDrawGizmos()
     {
@@ -75,6 +77,7 @@ public class Human : MonoBehaviour
         Gizmos.DrawCube(new Vector3(this.rigid2D.position.x, this.rigid2D.position.y + this.groundSensorPos.y, 0),new Vector3(this.groundSensorhalfSize.x, this.groundSensorhalfSize.y, 1));
     }
     */
+
     public bool isGrounded()
     { 
         Vector2 curGroundSensorPos = new Vector2(
@@ -121,10 +124,21 @@ public class Human : MonoBehaviour
         this.rigid2D.velocity = new Vector2(this.rigid2D.velocity.x, this.jumpSpeed);
     }
 
+    public void Defense()
+    {
+        UnityEngine.Debug.Log("Human:Defense | isDefensing");
+        m_Animator.SetBool("isDefensing", true);
+    }
+    public void EndDefense()
+    {
+        UnityEngine.Debug.Log("Human:EndDefense | isNotDefensing");
+        m_Animator.SetBool("isDefensing", false);
+    }
+
     public void Attack()
     {
-        
-        Debug.Log("Human:Attack | isAttacking");
+
+        UnityEngine.Debug.Log("Human:Attack | isAttacking");
         
         StartCoroutine(Attack1());
     }
@@ -135,14 +149,83 @@ public class Human : MonoBehaviour
         mustStopMove = true;
         m_Animator.SetTrigger("Attack");
         yield return new WaitForSeconds(0.2f);
-        int count = 0;
-        while (count <= 30)
+        /*if (isGrounded())
         {
-            this.rigid2D.velocity = new Vector2(this.speed * 10 * this.direction, this.rigid2D.velocity.y);
-            yield return new WaitForSeconds(0.003f);
-            count += 1;
+            int count = 0;
+
+            while (count <= 30)
+            {
+                this.rigid2D.velocity = new Vector2(this.speed * 10 * this.direction, this.rigid2D.velocity.y);
+                yield return new WaitForSeconds(0.003f);
+                count += 1;
+            }
+            
         }
+        */
         mustStopMove = false;
+    }
+
+    public int moveTo(int direction, float deltaX, bool isRunning)
+    {
+        this.direction = direction;
+        if (direction != 0)
+        {
+            transform.localScale = new Vector3(direction * 0.3f, 0.3f, 1);
+        }
+
+        if (mustStopMove)
+        {
+            return 0;
+        }
+        float moveSpeed;
+        if (isRunning)
+        {
+            moveSpeed = this.speed * 4 * direction;
+        }
+        else
+        {
+            moveSpeed = this.speed * direction;
+        }
+        int time = Mathf.Abs((int)Mathf.Round(deltaX / moveSpeed * 100));
+
+        StartCoroutine(moveToE(time, moveSpeed, isRunning));
+
+        return time;
+    }
+
+    IEnumerator moveToE(int time, float moveSpeed, bool isRunning)
+    {
+        
+
+        if (isRunning)
+        {
+            m_Animator.SetBool("isRunning", true);
+        }
+        else
+        {
+            m_Animator.SetBool("isWalking", true);
+        }
+
+        while (time >= 0)
+        {
+            if (AllStopBool)
+            {
+                yield break;
+            }
+            time -= 1;
+            this.rigid2D.velocity = new Vector2(moveSpeed, this.rigid2D.velocity.y);
+            yield return new WaitForSeconds(0.01f);
+        }
+
+        if (isRunning)
+        {
+            m_Animator.SetBool("isRunning", false);
+        }
+        else
+        {
+            m_Animator.SetBool("isWalking", false);
+        }
+
     }
 
     public void move(int direction, bool isRunning)
@@ -153,12 +236,14 @@ public class Human : MonoBehaviour
         {
             transform.localScale = new Vector3(direction * 0.3f, 0.3f, 1);
         }
+
         if (mustStopMove)
         {
             return;
         }
+
         float moveSpeed;
-        if (isRunning)
+        if (isRunning && !m_Animator.GetBool("isDefensing"))
         {
             moveSpeed = this.speed * 4;
         }
@@ -166,6 +251,7 @@ public class Human : MonoBehaviour
         {
             moveSpeed = this.speed;
         }
+
         this.rigid2D.velocity = new Vector2(direction * moveSpeed, this.rigid2D.velocity.y);
         if (isGrounded())
         {
@@ -200,5 +286,16 @@ public class Human : MonoBehaviour
         this.rigid2D.velocity = new Vector2(0, this.rigid2D.velocity.y);
         m_Animator.SetBool("isWalking", false);
         m_Animator.SetBool("isRunning", false);
+    }
+
+    public void AllStop()
+    {
+        AllStopBool = true;
+        this.rigid2D.velocity = new Vector2(0, this.rigid2D.velocity.y);
+        m_Animator.SetBool("isWalking", false);
+        m_Animator.SetBool("isRunning", false);
+        m_Animator.SetBool("isJumping", false);
+        m_Animator.SetBool("isFalling", false);
+        AllStopBool = false;
     }
 }

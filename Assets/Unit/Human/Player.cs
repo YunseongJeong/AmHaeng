@@ -15,7 +15,7 @@ public class Player : Human
         setSpeed(2);
         setJumpSpeed(15);
         setMass(100);
-        setGroundSensor(new Vector2(0, -2.2f), new Vector2(1, 0.2f));
+        setGroundSensor(new Vector2(0, 0.5f), new Vector2(1, 0.2f));
         isGrounded();
         setAnimator(m_animator);
         outerwearAnimator = outerwear.GetComponent<Animator>();
@@ -27,13 +27,19 @@ public class Player : Human
     // Update is called once per frame
     void Update()
     {
-        
 
-        if (Input.GetKeyDown(KeyCode.Mouse0))
+        if (Input.GetKeyDown(KeyCode.Mouse1))
+        {
+            Defense();
+        }
+        else if (Input.GetKeyUp(KeyCode.Mouse1))
+        {
+            EndDefense();
+        }
+        else if (Input.GetKeyDown(KeyCode.Mouse0))
         {
             //Attack
             Attack();
-            StartCoroutine(Delay(5f));
         }
         else
         {
@@ -65,10 +71,5 @@ public class Player : Human
 
             }
         }
-    }
-
-    IEnumerator Delay(float time)
-    {
-        yield return new WaitForSeconds(time);
     }
 }
