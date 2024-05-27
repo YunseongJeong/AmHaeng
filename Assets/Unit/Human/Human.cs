@@ -70,13 +70,13 @@ public class Human : MonoBehaviour
         this.groundSensorhalfSize = halfSize;
     }
 
-    /*
+    
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.red;
         Gizmos.DrawCube(new Vector3(this.rigid2D.position.x, this.rigid2D.position.y + this.groundSensorPos.y, 0),new Vector3(this.groundSensorhalfSize.x, this.groundSensorhalfSize.y, 1));
     }
-    */
+    
 
     public bool isGrounded()
     { 
@@ -241,7 +241,7 @@ public class Human : MonoBehaviour
         {
             return;
         }
-
+        
         float moveSpeed;
         if (isRunning && !m_Animator.GetBool("isDefensing"))
         {

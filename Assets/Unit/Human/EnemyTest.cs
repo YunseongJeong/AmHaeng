@@ -28,7 +28,7 @@ public class EnemyTest : Human
         setSpeed(speed);
         setJumpSpeed(15);
         setMass(100);
-        setGroundSensor(new Vector2(0, 1.2f), new Vector2(1, 0.2f));
+        setGroundSensor(new Vector2(0, 0.5f), new Vector2(1, 0.2f));
         isGrounded();
         setAnimator(m_animator);
         //nextPatternPlay();
@@ -93,8 +93,6 @@ public class EnemyTest : Human
     void Update()
     {
        
-
-
         attackDelay -= Time.deltaTime;
         if (attackDelay < 0) attackDelay = 0;
 
@@ -112,7 +110,7 @@ public class EnemyTest : Human
                 direction = 1;
             }
 
-            move(direction, true);
+            move(direction, false);
 
         }
         else if (Mathf.Abs(distance) < 3 && attackDelay == 0)
